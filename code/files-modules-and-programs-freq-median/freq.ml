@@ -9,19 +9,13 @@ let print_top counter =
   |> (fun counts -> List.take counts 10)
   |> List.iter ~f:(fun (line,count) -> printf "%3d: %s\n" count line)
 
-let print_median counter = ()
+let print_median counter =
+  Use_median_1.print_median (Counter.median counter)
 
 let () =
   let counter = build_counts () in
   print_top counter ;
   (* TODO: Ask question on stack overflow about how to find functions based on
    * names or type signatures. *)
-  Use_median_1.print_median (Counter.median counter)
-
-let () =
-  build_counts ()
-  |> Counter.to_list
-  |> List.sort ~cmp:(fun (_,x) (_,y) -> Int.descending x y)
-  |> (fun counts -> List.take counts 10)
-  |> List.iter ~f:(fun (line,count) -> printf "%3d: %s\n" count line)
-
+  printf "\n" ;
+  print_median counter
