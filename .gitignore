@@ -30,3 +30,6 @@ a.out
 .settings
 /commenting-build
 _build
+
+# these files are created by jbuilder
+*.install
