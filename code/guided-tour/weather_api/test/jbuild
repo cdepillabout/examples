@@ -1,0 +1,9 @@
+(jbuild_version 1)
+
+(rule
+ ((targets (weather_api.output))
+  (action (with-stdout-to ${@} (run ${bin:weather_api})))))
+
+(alias
+ ((name runtest)
+  (action (run diff -u ${path:weather_api.expected} ${path:weather_api.output}))))
