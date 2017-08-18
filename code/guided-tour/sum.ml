@@ -20,9 +20,38 @@ type point2d =
   ; y : float
   }
 
-let mypoint = {x = 3.; y = 5.5}
+let mypoint = { x = 3.; y = 5.5 }
 
-let fff {x; y} = x +. y
+let fff { x; y } = x +. y
+
+type circle_desc  = { center: point2d; radius: float }
+type rect_desc    = { lower_left: point2d; width: float; height: float }
+type segment_desc = { endpoint1: point2d; endpoint2: point2d }
+
+let magnitude { x; y } = sqrt (x ** 2. +. y ** 2.)
+
+let distance v1 v2 =
+  magnitude { x = v1.x -. v2.x; y = v1.y -. v2.y }
+
+type scene_element =
+  | Circle  of { center: point2d; radius: float }
+  | Rect    of rect_desc
+  | Segment of segment_desc
+
+let is_inside_scene_element point scene_element =
+  match scene_element with
+  | Circle { center; radius } ->
+    distance center point < radius
+  | Rect { lower_left; width; height } ->
+    point.x    > lower_left.x && point.x < lower_left.x +. width
+    && point.y > lower_left.y && point.y < lower_left.y +. height
+  | Segment { endpoint1; endpoint2 } -> false
+
+let is_inside_scene point scene =
+     List.exists scene
+       ~f:(fun el -> is_inside_scene_element point el)
+
+let scene_test = is_inside_scene mypoint [Circle {center = mypoint; radius = 3.}]
 
 let main () =
   printf "Total: %F\n" (read_and_accumulate 0.)
