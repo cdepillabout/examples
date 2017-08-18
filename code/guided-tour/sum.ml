@@ -53,5 +53,41 @@ let is_inside_scene point scene =
 
 let scene_test = is_inside_scene mypoint [Circle {center = mypoint; radius = 3.}]
 
+let arraytest =
+  let nums = [| 1; 2; 3; 4 |] in
+  nums.(2) <- 100 ;
+  nums
+
+type running_sum =
+  { mutable sum: float;
+    mutable sum_sq: float;
+    mutable samples: int;
+  }
+
+let mean {sum; samples} = sum /. Float.of_int samples
+
+let stdev rsum =
+  sqrt (rsum.sum_sq /. float rsum.samples -.
+        (rsum.sum /. float rsum.samples) ** 2.)
+
+let create_rsum =
+  { sum = 0.; sum_sq = 0. ; samples = 0 }
+
+let update_rsum rsum x =
+  rsum.samples <- rsum.samples + 1;
+  rsum.sum <- rsum.sum +. x;
+  rsum.sum_sq <- rsum.sum_sq +. x *. x
+
+let () =
+  List.iter [1.;3.;2.;-7.;4.;5.] ~f:(update_rsum create_rsum)
+
+let dorsum = create_rsum
+
+let tryref =
+  let x = ref 10 in
+  let y = !x in
+  x := !x + 1;
+  !x + y
+
 let main () =
   printf "Total: %F\n" (read_and_accumulate 0.)
