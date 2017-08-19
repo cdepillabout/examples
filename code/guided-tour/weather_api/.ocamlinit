@@ -10,7 +10,7 @@ let () =
 #require "core.top";;
 #require "core.syntax";;
 
-#require "cohttp";;
+#require "cohttp-top";;
 #require "cohttp-lwt-unix";;
 #require "lwt";;
 
