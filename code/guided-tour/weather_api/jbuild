@@ -2,7 +2,7 @@
 
 (executables
  ((names (main))
-  (libraries (cohttp cohttp-lwt-unix core lwt ssl))))
+  (libraries (cohttp cohttp-lwt-unix core lwt))))
 
 (install
  ((section bin)

@@ -13,7 +13,6 @@ let () =
 #require "cohttp";;
 #require "cohttp-lwt-unix";;
 #require "lwt";;
-#require "ssl";;
 
 (* Use Core as the standard library *)
 open Core

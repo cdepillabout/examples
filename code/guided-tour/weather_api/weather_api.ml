@@ -1,4 +1,4 @@
-open Lwt_s
+open Lwt
 open Cohttp
 open Cohttp_lwt_unix
 
