@@ -1,5 +1,0 @@
-(jbuild_version 1)
-
-(library
- ((name        weather_api)
-  (public_name weather_api)))

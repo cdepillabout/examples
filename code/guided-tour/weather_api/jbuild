@@ -2,7 +2,7 @@
 
 (executables
  ((names (main))
-  (libraries (weather_api))))
+  (libraries (cohttp cohttp-lwt-unix core lwt ssl))))
 
 (install
  ((section bin)
