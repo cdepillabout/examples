@@ -1,6 +1,8 @@
-open Lwt
 open Cohttp
 open Cohttp_lwt_unix
+open Core
+open Lwt
+open Yojson
 
 let weather_url = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22tokyo%2C%20japan%22)%20and%20u%20%3D%20%22c%22&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="
 
@@ -13,6 +15,40 @@ let do_request =
   Printf.printf "Body of length: %d\n" (String.length body);
   body
 
+type temp_scale = Fahrenheit | Celcius
+
+type temp =
+  { temp: int;
+    scale: temp_scale
+  }
+
+type current_weather =
+  { temp: temp;
+    weather: string
+  }
+
+let parse_json str = Yojson.Basic.from_string str
+
+let get_current_weather_json json =
+  let open Yojson.Basic.Util in
+  let query = json |> member "query" in
+  let results = query |> member "results" in
+  let channel = results |> member "channel" in
+  let item = channel |> member "item" in
+  let condition = item |> member "condition" in
+  condition
+
+let parse_current_weather json =
+  let open Yojson.Basic.Util in
+  let temp = json |> member "temp" |> to_string |> Int.of_string in
+  temp
+
 let run () =
   let body = Lwt_main.run do_request in
-  print_endline ("Received body\n" ^ body)
+  (* print_endline ("Received body\n" ^ body) *)
+  let json = parse_json body in
+  print_endline @@ "json: " ^ (Yojson.Basic.pretty_to_string json) ;
+  let current_weather_json = get_current_weather_json json in
+  print_endline @@ "weather: " ^ (Yojson.Basic.pretty_to_string current_weather_json);
+  let t = parse_current_weather current_weather_json in
+  printf "temp: %d\n" t
