@@ -2,7 +2,7 @@
 
 (executables
  ((names (main))
-  (libraries (cohttp cohttp-lwt-unix core lwt))))
+  (libraries (cohttp cohttp-lwt-unix core lwt yojson))))
 
 (install
  ((section bin)
