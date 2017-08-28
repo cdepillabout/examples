@@ -16,16 +16,26 @@ let do_request =
   body
 
 type temp_scale = Fahrenheit | Celcius
+  [@@deriving show]
 
 type temp =
   { temp: int;
     scale: temp_scale
   }
+  [@@deriving show]
 
 type current_weather =
   { temp: temp;
     weather: string
   }
+
+let temp_to_string {temp; scale} =
+  match scale with
+  | Fahrenheit -> string_of_int temp ^ "F"
+  | Celcius -> string_of_int temp ^ "C"
+
+let current_weather_to_string {temp; weather} =
+  temp_to_string temp ^ " " ^ weather
 
 let parse_json str = Yojson.Basic.from_string str
 
@@ -40,8 +50,10 @@ let get_current_weather_json json =
 
 let parse_current_weather json =
   let open Yojson.Basic.Util in
-  let temp = json |> member "temp" |> to_string |> Int.of_string in
-  temp
+  let temp_int = json |> member "temp" |> to_string |> Int.of_string in
+  let weather = json |> member "weather" |> to_string in
+  let temp = { temp = temp_int; scale = Celcius } in
+  { temp; weather }
 
 let run () =
   let body = Lwt_main.run do_request in
@@ -50,5 +62,5 @@ let run () =
   print_endline @@ "json: " ^ (Yojson.Basic.pretty_to_string json) ;
   let current_weather_json = get_current_weather_json json in
   print_endline @@ "weather: " ^ (Yojson.Basic.pretty_to_string current_weather_json);
-  let t = parse_current_weather current_weather_json in
-  printf "temp: %d\n" t
+  let current_weather = parse_current_weather current_weather_json in
+  printf "%s\n" (current_weather_to_string current_weather)
