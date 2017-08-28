@@ -9,6 +9,9 @@ let () =
 #camlp4o;;
 #require "core.top";;
 #require "core.syntax";;
+#require "ppx_jane";;
+#require "ppx_deriving.std";;
+#require "ppx_deriving.show";;
 
 (* Libraries specific to this projet *)
 #require "cohttp-top";;
