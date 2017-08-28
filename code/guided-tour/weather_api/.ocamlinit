@@ -10,9 +10,11 @@ let () =
 #require "core.top";;
 #require "core.syntax";;
 
+(* Libraries specific to this projet *)
 #require "cohttp-top";;
 #require "cohttp-lwt-unix";;
 #require "lwt";;
+#require "yojson";;
 
 (* Use Core as the standard library *)
 open Core
