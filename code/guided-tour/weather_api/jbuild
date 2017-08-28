@@ -2,7 +2,7 @@
 
 (executables
  ((names (main))
-  (libraries (cohttp cohttp-lwt-unix core lwt lwt_ssl ppx_deriving ssl yojson))
+  (libraries (cohttp cohttp-lwt-unix core lwt lwt_ssl ppx_deriving ppx_deriving.show ssl yojson))
   (preprocess (pps (ppx_deriving.show)))))
 
 (install
