@@ -8,11 +8,11 @@ let weather_url = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from
 
 let do_request =
   Client.get (Uri.of_string weather_url) >>= fun (resp, body) ->
-  let code = resp |> Response.status |> Code.code_of_status in
-  Printf.printf "Response code: %d\n" code;
-  Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string);
+  (* let code = resp |> Response.status |> Code.code_of_status in *)
+  (* Printf.printf "Response code: %d\n" code; *)
+  (* Printf.printf "Headers: %s\n" (resp |> Response.headers |> Header.to_string); *)
   body |> Cohttp_lwt.Body.to_string >|= fun body ->
-  Printf.printf "Body of length: %d\n" (String.length body);
+  (* Printf.printf "Body of length: %d\n" (String.length body); *)
   body
 
 type temp_scale = Fahrenheit | Celcius
@@ -28,6 +28,7 @@ type current_weather =
   { temp: temp;
     weather: string
   }
+  [@@deriving show]
 
 let temp_to_string {temp; scale} =
   match scale with
@@ -51,7 +52,7 @@ let get_current_weather_json json =
 let parse_current_weather json =
   let open Yojson.Basic.Util in
   let temp_int = json |> member "temp" |> to_string |> Int.of_string in
-  let weather = json |> member "weather" |> to_string in
+  let weather = json |> member "text" |> to_string in
   let temp = { temp = temp_int; scale = Celcius } in
   { temp; weather }
 
@@ -59,8 +60,9 @@ let run () =
   let body = Lwt_main.run do_request in
   (* print_endline ("Received body\n" ^ body) *)
   let json = parse_json body in
-  print_endline @@ "json: " ^ (Yojson.Basic.pretty_to_string json) ;
+  (* print_endline @@ "json: " ^ (Yojson.Basic.pretty_to_string json) ; *)
   let current_weather_json = get_current_weather_json json in
-  print_endline @@ "weather: " ^ (Yojson.Basic.pretty_to_string current_weather_json);
+  (* print_endline @@ "weather: " ^ (Yojson.Basic.pretty_to_string current_weather_json); *)
   let current_weather = parse_current_weather current_weather_json in
-  printf "%s\n" (current_weather_to_string current_weather)
+  (* printf "%s\n" (current_weather_to_string current_weather) *)
+  print_endline @@ show_current_weather current_weather
