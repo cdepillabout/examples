@@ -9,3 +9,14 @@ license: "Apache-2.0"
 build: [
   ["jbuilder" "build" "--only" "weather_api" "--root" "." "-j" jobs "@install"]
 ]
+depends: [
+  "cohttp"
+  "cohttp-lwt-unix"
+  "core"
+  "jbuilder"
+  "lwt"
+  "lwt_ssl"
+  "ppx_deriving"
+  "ssl"
+  "yojson"
+]
