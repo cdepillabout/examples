@@ -92,12 +92,23 @@ let todays_date : Date.t = Date.today (force Time.Zone.local)
 (* You can find the format supported in strptime *)
 let try_parse : Date.t = Date.parse ~fmt:"%d %b %Y" "02 Sep 2017"
 
-let find_forecast ?date forecasts = 
+let find_forecast ?date forecasts =
   let date =
     match date with
     | None -> Date.today (force Time.Zone.local)
     | Some date -> date
   in List.find forecasts ~f:(fun forecast -> forecast.date = date)
+
+let get_forecasts () =
+  let body = Lwt_main.run do_request in
+  let json = Yojson.Basic.from_string body in
+  let item_json = parse_item_json json in
+  let forecasts = parse_forecasts item_json in
+  forecasts
+
+let try_find_forecast forecasts =
+  let date = Date.parse ~fmt:"%Y-%m-%d" "2017-09-10"
+  in find_forecast forecasts ~date
 
 let run () =
   let body = Lwt_main.run do_request in
