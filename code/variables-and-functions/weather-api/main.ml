@@ -11,13 +11,13 @@ let do_request =
   body |> Cohttp_lwt.Body.to_string
 
 type temp_scale = Fahrenheit | Celcius
-  [@@deriving show]
+[@@deriving show]
 
 type temp =
   { temp: int;
     scale: temp_scale
   }
-  [@@deriving show]
+[@@deriving show]
 
 let temp_to_string {temp; scale} =
   match scale with
@@ -28,21 +28,21 @@ type current_weather =
   { temp: temp;
     weather: string
   }
-  [@@deriving show]
+[@@deriving show]
 
 let current_weather_to_string {temp; weather} =
   temp_to_string temp ^ " " ^ weather
 
 type forecast =
-  { date: string;
+  { date: Date.t;
     high: temp;
     low: temp;
     weather: string;
   }
-  [@@deriving show]
+[@@deriving show]
 
 type forecasts = forecast list
-  [@@deriving show]
+[@@deriving show]
 
 let parse_item_json json =
   let open Yojson.Basic.Util in
@@ -67,7 +67,8 @@ let parse_forecast forecast_json =
   let high_int = forecast_json |> member "high" |> to_string |> Int.of_string in
   let date_str = forecast_json |> member "date" |> to_string in
   let weather = forecast_json |> member "text" |> to_string in
-  { date = date_str;
+  let date = Date.parse ~fmt:"%d %b %Y" date_str in
+  { date;
     weather;
     low = { temp = low_int; scale = Celcius };
     high = { temp = high_int; scale = Celcius };
@@ -81,7 +82,7 @@ let parse_forecasts item_json =
   forecasts
 
 (* TODO: Use a function with an optional argument that defaults to today to get
-the forecast for an arbitrary day. *)
+   the forecast for an arbitrary day. *)
 
 let time_zone_str_japan = Time.Zone.to_string @@ force Time.Zone.local
 
@@ -89,6 +90,13 @@ let todays_date : Date.t = Date.today (force Time.Zone.local)
 
 (* You can find the format supported in strptime *)
 let try_parse : Date.t = Date.parse ~fmt:"%d %b %Y" "02 Sep 2017"
+
+let find_forecast ?date forecasts = 
+  let date =
+    match date with
+    | None -> Date.today (force Time.Zone.local)
+    | Some date -> date
+  in List.find forecasts ~f:(fun forecast -> forecast.date = date)
 
 let run () =
   let body = Lwt_main.run do_request in
