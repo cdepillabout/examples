@@ -83,6 +83,13 @@ let parse_forecasts item_json =
 (* TODO: Use a function with an optional argument that defaults to today to get
 the forecast for an arbitrary day. *)
 
+let time_zone_str_japan = Time.Zone.to_string @@ force Time.Zone.local
+
+let todays_date : Date.t = Date.today (force Time.Zone.local)
+
+(* You can find the format supported in strptime *)
+let try_parse : Date.t = Date.parse ~fmt:"%d %b %Y" "02 Sep 2017"
+
 let run () =
   let body = Lwt_main.run do_request in
   let json = Yojson.Basic.from_string body in
