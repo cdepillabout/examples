@@ -8,24 +8,8 @@ let do_request =
   Cohttp_lwt_unix.Client.get (Uri.of_string weather_url) >>= fun (resp, body) ->
   body |> Cohttp_lwt.Body.to_string
 
-type current_weather =
-  { temp: Temp.t;
-    weather: string
-  }
-[@@deriving show]
 
-let current_weather_to_string {temp; weather} =
-  Temp.to_string temp ^ " " ^ weather
-
-type forecast =
-  { date: Date.t;
-    high: Temp.t;
-    low: Temp.t;
-    weather: string;
-  }
-[@@deriving show]
-
-type forecasts = forecast list
+type forecasts = Forecast.t list
 [@@deriving show]
 
 let parse_item_json json =
@@ -43,7 +27,7 @@ let parse_current_weather item_json =
   let temp_int = condition |> member "temp" |> to_string |> Int.of_string in
   let weather = condition |> member "text" |> to_string in
   let temp = Temp.create temp_int Temp.Scale.Celcius in
-  { temp; weather }
+  Current.create temp weather
 
 let parse_forecast forecast_json =
   let open Yojson.Basic.Util in
@@ -52,11 +36,11 @@ let parse_forecast forecast_json =
   let date_str = forecast_json |> member "date" |> to_string in
   let weather = forecast_json |> member "text" |> to_string in
   let date = Date.parse ~fmt:"%d %b %Y" date_str in
-  { date;
-    weather;
-    low = Temp.create low_int Temp.Scale.Celcius;
-    high = Temp.create high_int Temp.Scale.Celcius;
-  }
+  Forecast.create
+    date
+    (Temp.create low_int Temp.Scale.Celcius)
+    (Temp.create high_int Temp.Scale.Celcius)
+    weather
 
 let parse_forecasts item_json =
   let open Yojson.Basic.Util in
@@ -80,7 +64,7 @@ let find_forecast ?date forecasts =
     match date with
     | None -> Date.today (force Time.Zone.local)
     | Some date -> date
-  in List.find forecasts ~f:(fun forecast -> forecast.date = date)
+  in List.find forecasts ~f:(fun forecast -> Forecast.date forecast = date)
 
 let get_forecasts () =
   let body = Lwt_main.run do_request in
@@ -102,5 +86,5 @@ let run () =
   let current_weather = parse_current_weather item_json in
   let forecasts = parse_forecasts item_json in
   (* printf "%s\n" (current_weather_to_string current_weather) *)
-  print_endline @@ show_current_weather current_weather ;
+  print_endline @@ Current.show current_weather ;
   print_endline @@ show_forecasts forecasts
