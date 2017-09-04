@@ -1,4 +1,4 @@
-.PHONY: build clean install test
+.PHONY: build clean install run test
 all: build
 
 build:
@@ -9,6 +9,9 @@ clean:
 
 install:
 	jbuilder build @install
+
+run: install
+	_build/install/default/bin/weather-api
 
 test:
 	jbuilder runtest

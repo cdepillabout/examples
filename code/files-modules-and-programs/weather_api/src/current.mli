@@ -8,3 +8,5 @@ val show : t -> string
 val pp : Format.formatter -> t -> Ppx_deriving_runtime.unit
 
 val to_string : t -> string
+
+val parse : Yojson.Basic.json -> t

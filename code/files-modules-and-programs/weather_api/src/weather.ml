@@ -1,33 +1,8 @@
 
 open Core
 
-let weather_url = "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places(1)%20where%20text%3D%22tokyo%2C%20japan%22)%20and%20u%20%3D%20%22c%22&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback="
-
-let do_request =
-  let open Lwt in
-  Cohttp_lwt_unix.Client.get (Uri.of_string weather_url) >>= fun (resp, body) ->
-  body |> Cohttp_lwt.Body.to_string
-
-
 type forecasts = Forecast.t list
 [@@deriving show]
-
-let parse_item_json json =
-  let open Yojson.Basic.Util in
-  let query = json |> member "query" in
-  let results = query |> member "results" in
-  let channel = results |> member "channel" in
-  let item = channel |> member "item" in
-  (* let condition = item |> member "condition" in *)
-  item
-
-let parse_current_weather item_json =
-  let open Yojson.Basic.Util in
-  let condition = item_json |> member "condition" in
-  let temp_int = condition |> member "temp" |> to_string |> Int.of_string in
-  let weather = condition |> member "text" |> to_string in
-  let temp = Temp.create temp_int Temp.Scale.Celcius in
-  Current.create temp weather
 
 let parse_forecast forecast_json =
   let open Yojson.Basic.Util in
@@ -67,9 +42,9 @@ let find_forecast ?date forecasts =
   in List.find forecasts ~f:(fun forecast -> Forecast.date forecast = date)
 
 let get_forecasts () =
-  let body = Lwt_main.run do_request in
+  let body = Lwt_main.run Request.call in
   let json = Yojson.Basic.from_string body in
-  let item_json = parse_item_json json in
+  let item_json = Item.parse json in
   let forecasts = parse_forecasts item_json in
   forecasts
 
@@ -78,12 +53,12 @@ let try_find_forecast forecasts =
   in find_forecast forecasts ~date
 
 let run () =
-  let body = Lwt_main.run do_request in
+  let body = Lwt_main.run Request.call in
   let json = Yojson.Basic.from_string body in
   print_endline @@ "json: " ^ (Yojson.Basic.pretty_to_string json) ;
-  let item_json = parse_item_json json in
+  let item_json = Item.parse json in
   (* print_endline @@ "weather: " ^ (Yojson.Basic.pretty_to_string current_weather_json); *)
-  let current_weather = parse_current_weather item_json in
+  let current_weather = Current.parse item_json in
   let forecasts = parse_forecasts item_json in
   (* printf "%s\n" (current_weather_to_string current_weather) *)
   print_endline @@ Current.show current_weather ;
