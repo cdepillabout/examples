@@ -1,0 +1,10 @@
+(jbuild_version 1)
+
+(executable
+ ((modules (main))
+  (name main)
+  (libraries (weather_api))))
+
+(install
+ ((section bin)
+  (files ((main.exe as weather-api)))))

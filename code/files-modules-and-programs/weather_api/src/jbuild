@@ -1,0 +1,17 @@
+(jbuild_version 1)
+
+(library
+ ((libraries
+   (cohttp
+    cohttp-lwt-unix
+    core
+    lwt
+    lwt_ssl
+    ppx_deriving
+    ppx_deriving.show
+    ssl
+    yojson))
+  (modules (weather))
+  (name weather_api)
+  (preprocess (pps (ppx_deriving.show)))
+  (public_name weather_api)))
