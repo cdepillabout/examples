@@ -11,23 +11,6 @@ let parse_forecasts item_json =
   let forecasts = List.map ~f:Forecast.parse forecasts_json_list in
   forecasts
 
-(* TODO: Use a function with an optional argument that defaults to today to get
-   the forecast for an arbitrary day. *)
-
-let time_zone_str_japan = Time.Zone.to_string @@ force Time.Zone.local
-
-let todays_date : Date.t = Date.today (force Time.Zone.local)
-
-(* You can find the format supported in strptime *)
-let try_parse : Date.t = Date.parse ~fmt:"%d %b %Y" "02 Sep 2017"
-
-let find_forecast ?date forecasts =
-  let date =
-    match date with
-    | None -> Date.today (force Time.Zone.local)
-    | Some date -> date
-  in List.find forecasts ~f:(fun forecast -> Forecast.date forecast = date)
-
 let get_forecasts () =
   let body = Lwt_main.run Request.call in
   let json = Yojson.Basic.from_string body in
@@ -35,9 +18,7 @@ let get_forecasts () =
   let forecasts = parse_forecasts item_json in
   forecasts
 
-let try_find_forecast forecasts =
-  let date = Date.parse ~fmt:"%Y-%m-%d" "2017-09-10"
-  in find_forecast forecasts ~date
+let try_find_forecast forecasts = Forecast.find_raw_date "2017-09-10" forecasts
 
 let run () =
   let body = Lwt_main.run Request.call in
@@ -49,4 +30,9 @@ let run () =
   let forecasts = parse_forecasts item_json in
   (* printf "%s\n" (current_weather_to_string current_weather) *)
   print_endline @@ Current.show current_weather ;
-  print_endline @@ show_forecasts forecasts
+  print_endline @@ show_forecasts forecasts ;
+  match Forecast.find_raw_date "2017-09-10" forecasts with
+  | None -> print_endline "Could not find a forecast for date 2017-09-10."
+  | Some forecast ->
+    print_endline "Found forecast for date 2017-09-10:" ;
+    print_endline @@ Forecast.show forecast

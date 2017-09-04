@@ -25,3 +25,13 @@ let parse forecast_json =
     (Temp.create high_int Temp.Scale.Celcius)
     weather
 
+let find ?date forecasts =
+  let date =
+    match date with
+    | None -> Date.today (force Time.Zone.local)
+    | Some date -> date
+  in List.find forecasts ~f:(fun forecast -> forecast.date = date)
+
+let find_raw_date date forecasts =
+  let date = Date.parse ~fmt:"%Y-%m-%d" date
+  in find forecasts ~date
