@@ -4,24 +4,11 @@ open Core
 type forecasts = Forecast.t list
 [@@deriving show]
 
-let parse_forecast forecast_json =
-  let open Yojson.Basic.Util in
-  let low_int = forecast_json |> member "low" |> to_string |> Int.of_string in
-  let high_int = forecast_json |> member "high" |> to_string |> Int.of_string in
-  let date_str = forecast_json |> member "date" |> to_string in
-  let weather = forecast_json |> member "text" |> to_string in
-  let date = Date.parse ~fmt:"%d %b %Y" date_str in
-  Forecast.create
-    date
-    (Temp.create low_int Temp.Scale.Celcius)
-    (Temp.create high_int Temp.Scale.Celcius)
-    weather
-
 let parse_forecasts item_json =
   let open Yojson.Basic.Util in
   let forecasts_json = item_json |> member "forecast" in
   let forecasts_json_list = forecasts_json |> to_list in
-  let forecasts = List.map ~f:parse_forecast forecasts_json_list in
+  let forecasts = List.map ~f:Forecast.parse forecasts_json_list in
   forecasts
 
 (* TODO: Use a function with an optional argument that defaults to today to get
