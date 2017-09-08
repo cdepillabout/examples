@@ -1,0 +1,7 @@
+S .
+B _build
+PKG async
+PKG core
+PKG core_extended
+PKG re.posix
+EXT nonrec
