@@ -1,0 +1,13 @@
+(jbuild_version 1)
+
+(library
+ ((libraries
+   (core
+    ppx_deriving
+    ppx_deriving.show
+    ppx_fields_conv
+	re.posix
+   ))
+  (name example)
+  (preprocess (pps (ppx_deriving.show ppx_fields_conv)))
+  (public_name example)))

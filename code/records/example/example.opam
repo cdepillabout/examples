@@ -1,0 +1,15 @@
+opam-version: "1.2"
+version: "1.0"
+maintainer: "cdep.illabout@gmail.com"
+authors: ["Dennis Gosnell"]
+homepage: "https://github.com/cdepillabout/not_a_real_repo"
+bug-reports: "https://github.com/cdepillabout/not_a_real_repo/issues"
+dev-repo: "https://github.com/cdepillabout/not_a_real_repo.git"
+license: "Apache-2.0"
+build: [
+  ["jbuilder" "build" "--only" "weather_api" "--root" "." "-j" jobs "@install"]
+]
+depends: [
+  "core"
+  "re.posix"
+]

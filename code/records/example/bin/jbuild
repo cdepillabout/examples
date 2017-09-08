@@ -1,0 +1,9 @@
+(jbuild_version 1)
+
+(executable
+ ((name main)
+  (libraries (example))))
+
+(install
+ ((section bin)
+  (files ((main.exe as example)))))
