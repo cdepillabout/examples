@@ -1,4 +1,4 @@
-.PHONY: build clean install run test
+.PHONY: build clean install run test utop
 all: build
 
 build:
@@ -15,3 +15,6 @@ run: install
 
 test:
 	jbuilder runtest
+
+utop:
+	jbuilder utop src/
