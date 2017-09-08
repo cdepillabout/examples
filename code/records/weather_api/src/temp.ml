@@ -18,3 +18,6 @@ let to_string {temp; scale} =
   match scale with
   | Fahrenheit -> string_of_int temp ^ "F"
   | Celcius -> string_of_int temp ^ "C"
+
+let succ_temp t =
+  { t with temp = t.temp + 1 }

@@ -10,3 +10,5 @@ type t
 val create : temp:int -> scale:Scale.t -> t
 
 val to_string : t -> string
+
+val succ_temp : t -> t
