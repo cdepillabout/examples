@@ -9,8 +9,9 @@
     lwt_ssl
     ppx_deriving
     ppx_deriving.show
+	ppx_fields_conv
     ssl
     yojson))
   (name weather_api)
-  (preprocess (pps (ppx_deriving.show)))
+  (preprocess (pps (ppx_deriving.show ppx_fields_conv)))
   (public_name weather_api)))

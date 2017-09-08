@@ -11,7 +11,8 @@ type t =
   }
 [@@deriving fields, show]
 
-let create temp scale = {temp; scale}
+(* let create temp scale = {temp; scale} *)
+let create = Fields.create
 
 let to_string {temp; scale} =
   match scale with

@@ -6,11 +6,9 @@ type t =
     low: Temp.t;
     weather: string;
   }
-[@@deriving show]
+[@@deriving fields, show]
 
-let create date high low weather = {date; high; low; weather}
-
-let date forecast = forecast.date
+let create = Fields.create
 
 let parse forecast_json =
   let open Yojson.Basic.Util in

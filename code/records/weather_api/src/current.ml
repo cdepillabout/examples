@@ -4,9 +4,9 @@ type t =
   { temp: Temp.t;
     weather: string
   }
-[@@deriving show]
+[@@deriving fields, show]
 
-let create temp weather = {temp; weather}
+let create = Fields.create
 
 let to_string {temp; weather} =
   Temp.to_string temp ^ " " ^ weather

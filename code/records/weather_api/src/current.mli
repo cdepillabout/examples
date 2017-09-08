@@ -2,7 +2,7 @@
 type t
 [@@deriving show]
 
-val create : Temp.t -> string -> t
+val create : temp:Temp.t -> weather:string -> t
 
 val to_string : t -> string
 

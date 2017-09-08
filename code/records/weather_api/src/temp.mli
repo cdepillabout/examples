@@ -5,8 +5,8 @@ module Scale : sig
 end
 
 type t
-[@@deriving fields, show]
+[@@deriving show]
 
-val create : int -> Scale.t -> t
+val create : temp:int -> scale:Scale.t -> t
 
 val to_string : t -> string
