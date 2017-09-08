@@ -142,3 +142,24 @@ type client_info' =
 let register_heartbeat' t hb =
   t.last_heartbeat_time   <- hb.Heartbeat.time;
   t.last_heartbeat_status <- hb.Heartbeat.status_message
+
+let get_users logons = List.dedup (List.map logons ~f:Logon.user)
+
+(* Using Fieldslib we can write a generic way to show a field. *)
+let show_field field to_string record =
+  let open Fieldslib in
+  let name = Field.name field in
+  let field_string = to_string (Field.get field record) in
+  name ^ ": " ^ field_string
+
+let res4 =
+  let logon =
+    { Logon.
+      session_id = "26685";
+      time = Time_ns.of_string "2017-07-21 10:11:45 EST";
+      user = "yminsky";
+      credentials = "Xy2d9W"; }
+  in
+  let user_field = show_field Logon.Fields.user Fn.id logon in
+  let time_field = show_field Logon.Fields.time Time_ns.to_string logon in
+  user_field ^ ", " ^ time_field
