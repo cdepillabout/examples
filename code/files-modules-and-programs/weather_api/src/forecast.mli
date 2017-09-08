@@ -1,10 +1,7 @@
 open Core
 
 type t
-
-val show : t -> string
-
-val pp : Format.formatter -> t -> Ppx_deriving_runtime.unit
+[@@deriving show]
 
 val create : Date.t -> Temp.t -> Temp.t -> string -> t
 

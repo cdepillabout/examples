@@ -1,11 +1,11 @@
 
 module Scale : sig
   type t = Fahrenheit | Celcius
+  [@@deriving show]
 end
 
 type t
-
-val pp : Format.formatter -> t -> Ppx_deriving_runtime.unit
+[@@deriving show]
 
 val create : int -> Scale.t -> t
 
