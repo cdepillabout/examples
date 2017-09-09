@@ -3,7 +3,7 @@ open Core
 type t
 [@@deriving show]
 
-val create : date:Date.t -> high:Temp.t -> low:Temp.t -> weather:string -> t
+val create : date:Date.t -> high:Temp.t -> low:Temp.t -> weather:Weather.t -> t
 
 val date : t -> Date.t
 

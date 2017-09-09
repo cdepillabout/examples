@@ -1,2 +1,2 @@
 
-let () = Weather_api.Weather.run ()
+let () = Weather_api.Api.run ()
