@@ -153,3 +153,124 @@ module Logging3 = struct
 end
 
 let res4 = Logging3.Log_entry.{message = "hello"; important = true}
+
+type 'a expr =
+  | Base  of 'a
+  | Const of bool
+  | And   of 'a expr list
+  | Or    of 'a expr list
+  | Not   of 'a expr
+
+type mail_field = To | From | CC | Date | Subject
+
+type mail_predicate =
+  { field: mail_field;
+    contains: string
+  }
+
+let test (field : mail_field) (contains : string) : mail_predicate expr =
+  Base { field; contains }
+
+let res5 =
+  And
+    [ Or
+        [ test To "doligez";
+          test CC "doligez"
+        ];
+      test Subject "runtime";
+    ]
+
+let rec eval (expr : 'a expr) (base_eval : 'a -> bool) : bool =
+  (* a shortcut, so we don't need to repeatedly pass [base_eval]
+     explicitly to [eval] *)
+  let eval' expr = eval expr base_eval in
+  match expr with
+  | Base  base  -> base_eval base
+  | Const bool  -> bool
+  | And   exprs -> List.for_all exprs ~f:eval'
+  | Or    exprs -> List.exists  exprs ~f:eval'
+  | Not   expr  -> not (eval' expr)
+
+let and_ l =
+  if List.mem l (Const false) (=)
+  then Const false
+  else
+    match List.filter l ~f:((<>) (Const true)) with
+    | [] -> Const true
+    | [ x ] -> x
+    | l -> And l
+
+let or_ l =
+  if List.mem l (Const true) (=)
+  then Const true
+  else
+    match List.filter l ~f:((<>) (Const false)) with
+    | [] -> Const false
+    | [x] -> x
+    | l -> Or l
+
+let not_ = function
+  | Const b -> Const (not b)
+  | Not e -> e
+  | (Base _ | And _ | Or _ ) as e -> Not e
+
+let rec simplify = function
+  | Base _ | Const _ as x -> x
+  | And l -> and_ (List.map ~f:simplify l)
+  | Or l  -> or_  (List.map ~f:simplify l)
+  | Not e -> not_ (simplify e)
+
+let res6 =
+  simplify
+    (Not
+       (And
+          [ Or
+              [ Base "it's snowing";
+                Const true
+              ];
+            Base "it's raining"
+          ]
+       )
+    )
+
+
+(* TODO: project idea: play around with Core_kernel.Blang. *)
+
+
+let three : [> `Int of int] = `Int 3
+
+let four : [> `Float of float] = `Float 4.
+
+let nan : [> `Not_a_number] = `Not_a_number
+
+let res7 : [> `Float of float | `Int of int | `Not_a_number] list =
+  [three; four; nan]
+
+let is_positive : [< `Float of float | `Int of int] -> bool = function
+  | `Int   x -> x > 0
+  | `Float x -> x > 0.
+
+let is_positive2 : [> `Float of float | `Int of int] -> bool = function
+  | `Int   x -> x > 0
+  | `Float x -> x > 0.
+  | _ -> false
+
+let exact : [> `Float of float | `Int of int] list = List.filter ~f:is_positive [three;four]
+
+let exact2 = List.filter ~f:is_positive [three;four]
+
+let exact3 = List.filter ~f:is_positive2 [three;four]
+
+let is_positive3 = function
+    | `Int   x -> Ok (x > 0)
+    | `Float x -> Ok (x > 0.)
+    | `Not_a_number -> Error "not a number";;
+
+let res8 =
+  List.filter
+    [three; four]
+    ~f:(fun x ->
+        match is_positive3 x with
+        | Error _ -> false
+        | Ok b -> b
+      )
