@@ -19,8 +19,7 @@ let basic_color_to_int = function
   | White -> 7
 
 let color_by_number number text =
-      sprintf "\027[38;5;%dm%s\027[0m" number text;;
-
+      sprintf "\027[38;5;%dm%s\027[0m" number text
 
 type weight = Regular | Bold
 
@@ -192,7 +191,7 @@ let rec eval (expr : 'a expr) (base_eval : 'a -> bool) : bool =
   | Not   expr  -> not (eval' expr)
 
 let and_ l =
-  if List.mem l (Const false) (=)
+  if List.mem l (Const false) ~equal:(=)
   then Const false
   else
     match List.filter l ~f:((<>) (Const true)) with
@@ -201,7 +200,7 @@ let and_ l =
     | l -> And l
 
 let or_ l =
-  if List.mem l (Const true) (=)
+  if List.mem l (Const true) ~equal:(=)
   then Const true
   else
     match List.filter l ~f:((<>) (Const false)) with
@@ -251,7 +250,7 @@ let is_positive2 : [> `Float of float | `Int of int] -> bool = function
   | `Float x -> x > 0.
   | _ -> false
 
-let exact : [> `Float of float | `Int of int] list = List.filter ~f:is_positive [three;four]
+let exact : [`Float of float | `Int of int] list = List.filter ~f:is_positive [three;four]
 
 let exact2 = List.filter ~f:is_positive [three;four]
 
@@ -260,7 +259,7 @@ let exact3 = List.filter ~f:is_positive2 [three;four]
 let is_positive3 = function
     | `Int   x -> Ok (x > 0)
     | `Float x -> Ok (x > 0.)
-    | `Not_a_number -> Error "not a number";;
+    | `Not_a_number -> Error "not a number"
 
 let res8 =
   List.filter
@@ -273,26 +272,83 @@ let res8 =
 
 module PolyVarColor = struct
 
-  let basic_color_to_int = function
+  let basic_color_to_int :
+    [< `Black
+    | `Blue
+    | `Cyan
+    | `Green
+    | `Magenta
+    | `Red
+    | `White
+    | `Yellow
+    ] -> int =
+    function
     | `Black -> 0 | `Red     -> 1 | `Green -> 2 | `Yellow -> 3
     | `Blue  -> 4 | `Magenta -> 5 | `Cyan  -> 6 | `White  -> 7
 
-  let color_to_int = function
+  let color_to_int :
+    [< `Basic of
+         [< `Black
+         | `Blue
+         | `Cyan
+         | `Green
+         | `Magenta
+         | `Red
+         | `White
+         | `Yellow
+         ] *
+         [< `Bold | `Regular ]
+    | `RGB of int * int * int
+    | `Gray of int
+    ] -> int
+    = function
     | `Basic (basic_color,weight) ->
         let base = match weight with `Bold -> 8 | `Regular -> 0 in
         base + basic_color_to_int basic_color
     | `RGB (r,g,b) -> 16 + b + g * 6 + r * 36
     | `Gray i -> 232 + i
 
-  let extended_color_to_int = function
+  let extended_color_to_int :
+    [< `RGBA of int * int * int * int
+    | `Basic of
+         [< `Black
+         | `Blue
+         | `Cyan
+         | `Green
+         | `Magenta
+         | `Red
+         | `White
+         | `Yellow
+         ] *
+         [< `Bold | `Regular ]
+    | `RGB of int * int * int
+    | `Gray of int
+    ] -> int =
+    function
     | `RGBA (r,g,b,a) -> 256 + a + b * 6 + g * 36 + r * 216
     (* Note that we can't use a catch-all case here, because then color_to_int
      * wouldn't be passed something of the correct type. *)
     | (`Basic _ | `RGB _ | `Gray _) as color -> color_to_int color
 
-  let extended_color_to_int' : [< `RGBA of int * int * int * int | `Basic of int * int | `RGB of int * int * int | `Gray of int ] = function
-    | `RGBA (r,g,b,a) -> 256 + a + b * 6 + g * 36 + r * 216
-    (* We can use a catch-all case here because the type signature limits what
-     * the type of color can be. *)
-    | color -> color_to_int color
+  (* This doesn't work because the pattern match can't limit the type of color. *)
+  (* let extended_color_to_int' : *)
+  (*   [< `RGBA of int * int * int * int *)
+  (*   | `Basic of *)
+  (*        [< `Black *)
+  (*        | `Blue *)
+  (*        | `Cyan *)
+  (*        | `Green *)
+  (*        | `Magenta *)
+  (*        | `Red *)
+  (*        | `White *)
+  (*        | `Yellow *)
+  (*        ] * *)
+  (*        [< `Bold | `Regular ] *)
+  (*   | `RGB of int * int * int *)
+  (*   | `Gray of int *)
+  (*   ] -> int = function *)
+  (*   | `RGBA (r,g,b,a) -> 256 + a + b * 6 + g * 36 + r * 216 *)
+  (*   (\* We can use a catch-all case here because the type signature limits what *)
+  (*    * the type of color can be. *\) *)
+  (*   | color -> color_to_int color *)
 end
