@@ -190,7 +190,7 @@ let rec eval (expr : 'a expr) (base_eval : 'a -> bool) : bool =
   | Or    exprs -> List.exists  exprs ~f:eval'
   | Not   expr  -> not (eval' expr)
 
-let and_ l =
+let and_ l : 'a expr =
   if List.mem l (Const false) ~equal:(=)
   then Const false
   else
