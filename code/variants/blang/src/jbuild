@@ -1,0 +1,10 @@
+(jbuild_version 1)
+
+(library
+ ((libraries
+   (core
+    ppx_deriving
+    ppx_deriving.show))
+  (name myblang)
+  (preprocess (pps (ppx_deriving.show)))
+  (public_name myblang)))
