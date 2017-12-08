@@ -1,7 +1,7 @@
 
 open Core
 
-exception Key_not_found of string
+exception Key_not_found of string [@@deriving sexp]
 
 let rec find_exn alist key = match alist with
     | [] -> raise (Key_not_found key)
