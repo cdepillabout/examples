@@ -1,0 +1,10 @@
+
+(jbuild_version 1)
+
+(executable
+  ((name av)
+   (public_name alpha_vantage)
+   (modules av)
+   (libraries (core))
+  )
+)
