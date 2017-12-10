@@ -33,7 +33,7 @@ let find_safe'' list key =
 let find_safe''' alist key =
     Option.try_with (fun _ -> find_exn alist key)
 
-let run () = 
+let run () =
   (* printf "%d\n" @@ find_exn alist "a" ; *)
   (try printf "found (find_ex): %d\n" @@ find_exn alist "c" with
   | Key_not_found str -> printf "Couldn't find value for key (find_ex): %s\n" str
@@ -65,5 +65,39 @@ let run () =
   | Some res -> printf "found (find_safe'''): %d\n" res
   | None -> printf "not found (find_safe''')\n";
   )
+
+let lookup_weight ~compute_weight alist key =
+  try
+    let data = List.Assoc.find_exn alist key in
+    compute_weight data
+  with
+    Not_found -> 0.
+
+(* If compute_weight throws an exception in the previous lookup_weight, then it
+   will be incorrectly caught. Writing the code the following way stops
+   lookup_weight from incorrect catching errors thrown by compute_weight.
+*)
+let lookup_weight' ~compute_weight alist key =
+  match
+    try Some (List.Assoc.find_exn alist key)
+    with _ -> None
+  with
+  | None -> 0.
+  | Some data -> compute_weight data
+
+(* OCaml allows for exceptions to be caught by match statements directly. *)
+let lookup_weight ~compute_weight alist key =
+  match List.Assoc.find_exn alist key with
+  | exception _ -> 0.
+  | data -> compute_weight data
+
+(* Turn exception into an Or_error (which is a Result with the error being Error *)
+let find alist key =
+    Or_error.try_with (fun () -> find_exn alist key)
+
+(* Turn Or_error back into exception. *)
+let () =
+  let int = Or_error.ok_exn (find ["a",1; "b",2] "b") in
+  printf "Res: %d\n" int
 
 let () = run ()
