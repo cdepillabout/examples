@@ -1,0 +1,12 @@
+build: [
+  ["jbuilder" "build" "--only" "alpha_vantage" "--root" "." "-j" jobs "@install"]
+]
+depends: [
+  "cohttp"
+  "cohttp-async"
+  "core"
+  "jbuilder"
+  "ppx_deriving"
+  "ssl"
+  "yojson"
+]

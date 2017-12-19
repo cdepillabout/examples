@@ -5,6 +5,11 @@
   ((name av)
    (public_name alpha_vantage)
    (modules av)
-   (libraries (core))
+   (libraries
+	 (cohttp
+	  cohttp-async
+	  core
+	  ssl
+	  ))
   )
 )
